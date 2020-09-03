@@ -211,10 +211,16 @@ function wrapEventFunction(
       // context properties represented as event top-level properties.
       // Context is everything but data.
       context = event;
-      // Clear the property before removing field so the data object
-      // is not deleted.
-      context.data = undefined;
-      delete context.data;
+      if(data === undefined) {
+        data = event.message.data
+        delete event.message.data
+      }
+      else {
+          // Clear the property before removing field so the data object
+          // is not deleted.
+          context.data = undefined;
+          delete context.data;
+      }
     }
     // Callback style if user function has more than 2 arguments.
     if (userFunction!.length > 2) {
@@ -225,7 +231,7 @@ function wrapEventFunction(
     const fn = userFunction as EventFunction;
     Promise.resolve()
       .then(() => {
-        const result = fn(data, context);
+        const result = fn({data}, context);
         return result;
       })
       .then(
